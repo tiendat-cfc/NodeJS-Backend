@@ -11,31 +11,24 @@
 // })
 
 //Sử dụng ExpressJS
-const express = require('express')  //commonjs
-const path = require('path') //commonjs - có sẵn trong nodejs
-require('dotenv').config()
+require('dotenv').config() //dotenv: dùng để quản lý các biến môi trường
 //import express from 'express';  //es modules
+const express = require('express')  //commonjs
+
+const configViewEngine = require('./config/viewEngine')
+const webRouter = require('./routes/web') //mapping tới biến xuất ra từ file bên kia =)))
 
 const app = express(); //app cua express
 const port = process.env.PORT || 8888; //port => hardcode
 const hostname = process.env.HOST_NAME;
 
 //config template engine
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs')
+configViewEngine(app);
 
-//Cấu hình static file với ExpressJS
-app.use(express.static(path.join(__dirname, 'public')))
-
-//Khai bao Route
-app.get('/', (req, res) => {
-  res.send('Hello Dat!, Welcome to my website')
-})
-
-//Tạo view động
-app.get('/dat', (req, res) => {
-  res.render('sample.ejs')
-})
+//khai báo Route
+app.use('/', webRouter) //đường route mặc định
+// app.use('/test', webRouter) //route này hiểu '/test' như 1 tiền tố
+// VD: 'http://localhost:8082/test/dat' thì kết quả cũng giống 'http://localhost:8082/dat'
 
 app.listen(port, hostname, () => {
   console.log(`Example app listening on port ${port}`)
